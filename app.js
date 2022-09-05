@@ -14,7 +14,7 @@ app.get('/api/reviews/:review_id', getReviews)
 
 
 app.all('/*', (req, res, next) => {
-    res.status(404).send({ msg: 'NOT FOUND' })
+    res.status(404).send({ msg: 'Path not found' })
 })
 
 

@@ -14,7 +14,7 @@ describe('GET', () => {
                 .get('/api/banana')
                 .expect(404)
                 .then(({ body }) => {
-                    expect(body.msg).toBe('NOT FOUND');
+                    expect(body.msg).toBe('Path not found');
 
                 });
         });
@@ -63,7 +63,7 @@ describe('GET', () => {
                 .get('/api/reviews/100')
                 .expect(404)
                 .then(({ body }) => {
-                    expect(body.msg).toBe('NOT FOUND');
+                    expect(body.msg).toBe('Path not found');
 
                 });
         });
@@ -72,7 +72,7 @@ describe('GET', () => {
                 .get('/api/reviews/banana')
                 .expect(404)
                 .then(({ body }) => {
-                    expect(body.msg).toBe('NOT FOUND');
+                    expect(body.msg).toBe('Path not found');
 
                 });
         });

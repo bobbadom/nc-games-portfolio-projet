@@ -8,6 +8,17 @@ beforeEach(() => seed(testData))
 afterAll(() => db.end())
 
 describe('GET', () => {
+    describe('checking wrong paths', () => {
+        test('404: should return error when given a invalid path', () => {
+            return request(app)
+                .get('/api/banana')
+                .expect(404)
+                .then(({ body }) => {
+                    expect(body.msg).toBe('NOT FOUND');
+
+                });
+        });
+    });
     describe('GET categories', () => {
         test('200: should return an array of the catagories', () => {
             return request(app)
@@ -27,7 +38,7 @@ describe('GET', () => {
                 })
         });
     });
-    describe.only('GET reviews', () => {
+    describe('GET reviews', () => {
         test('200: should return an array of the catagories', () => {
             return request(app)
                 .get('/api/reviews/2')
@@ -47,12 +58,21 @@ describe('GET', () => {
                     })
                 })
         })
-        test('400: should return a error when given a review_id that does not exist', () => {
+        test('404: should return a error when given a review_id that does not exist', () => {
             return request(app)
                 .get('/api/reviews/100')
-                .expect(400)
+                .expect(404)
                 .then(({ body }) => {
-                    expect(body.msg).toBe('Invalid key');
+                    expect(body.msg).toBe('NOT FOUND');
+
+                });
+        });
+        test('404: should return a error when given a review_id that does not exist', () => {
+            return request(app)
+                .get('/api/reviews/banana')
+                .expect(404)
+                .then(({ body }) => {
+                    expect(body.msg).toBe('NOT FOUND');
 
                 });
         });

@@ -98,3 +98,54 @@ describe('GET', () => {
         });
     });
 })
+
+describe('PATCH', () => {
+    describe('PATCH reviews', () => {
+        test('200: should increment the votes by the by the amount requested', () => {
+            const voteChange = {
+                vote: 100
+            }
+            return request(app)
+                .patch('/api/reviews/2')
+                .expect(200)
+                .send(voteChange)
+                .then(({ body }) => {
+                    const review = body
+                    expect(review).toEqual({
+                        review_id: 2,
+                        title: 'Jenga',
+                        category: 'dexterity',
+                        designer: 'Leslie Scott',
+                        owner: 'philippaclaire9',
+                        review_body: 'Fiddly fun for all the family',
+                        review_img_url: 'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
+                        created_at: '2021-01-18T10:01:41.251Z',
+                        votes: 105
+                    })
+                })
+        });
+        test('200: should decrement the votes by the by the amount requested', () => {
+            const voteChange = {
+                vote: -4
+            }
+            return request(app)
+                .patch('/api/reviews/2')
+                .expect(200)
+                .send(voteChange)
+                .then(({ body }) => {
+                    const review = body
+                    expect(review).toEqual({
+                        review_id: 2,
+                        title: 'Jenga',
+                        category: 'dexterity',
+                        designer: 'Leslie Scott',
+                        owner: 'philippaclaire9',
+                        review_body: 'Fiddly fun for all the family',
+                        review_img_url: 'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
+                        created_at: '2021-01-18T10:01:41.251Z',
+                        votes: 1
+                    })
+                })
+        });
+    });
+});

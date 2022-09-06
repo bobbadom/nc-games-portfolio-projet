@@ -39,7 +39,7 @@ describe('GET', () => {
         });
     });
     describe('GET reviews', () => {
-        test('200: should return an array of the catagories', () => {
+        test('200: should return an array of the reviews with the added comment count', () => {
             return request(app)
                 .get('/api/reviews/2')
                 .expect(200)
@@ -54,7 +54,8 @@ describe('GET', () => {
                         review_body: 'Fiddly fun for all the family',
                         review_img_url: 'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
                         created_at: '2021-01-18T10:01:41.251Z',
-                        votes: 5
+                        votes: 5,
+                        comment_count: 3
                     })
                 })
         })

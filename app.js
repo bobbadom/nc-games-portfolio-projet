@@ -1,4 +1,5 @@
 const express = require('express')
+
 const { getCategories } = require('./Controllers/get-categories');
 const { getReviews } = require('./Controllers/get-reviews');
 const { getUsers } = require('./Controllers/get-users');
@@ -14,6 +15,7 @@ app.get('/api/categories', getCategories);
 app.get('/api/reviews/:review_id', getReviews)
 
 app.get('/api/users', getUsers)
+
 
 app.patch('/api/reviews/:review_id', patchReviews)
 

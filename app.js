@@ -1,8 +1,8 @@
 const express = require('express')
-const { getCategories } = require('./Controllers/Get-Categories');
-const { getReviews } = require('./Controllers/Get-reviews');
-const { getUsers } = require('./Controllers/Get-users');
-const { patchReviews } = require('./Controllers/Patch-reviews');
+const { getCategories } = require('./Controllers/get-categories');
+const { getReviews } = require('./Controllers/get-reviews');
+const { getUsers } = require('./Controllers/get-users');
+const { patchReviews } = require('./Controllers/patch-reviews');
 
 
 const app = express();

@@ -61,9 +61,9 @@ describe('GET', () => {
         test('404: should return a error when given a review_id that does not exist', () => {
             return request(app)
                 .get('/api/reviews/100')
-                .expect(404)
+                .expect(400)
                 .then(({ body }) => {
-                    expect(body.msg).toBe('Path not found');
+                    expect(body.msg).toBe('ID does not exist');
 
                 });
         });
@@ -103,15 +103,14 @@ describe('PATCH', () => {
     describe('PATCH reviews', () => {
         test('200: should increment the votes by the by the amount requested', () => {
             const voteChange = {
-                vote: 100
+                inc_vote: 100
             }
             return request(app)
                 .patch('/api/reviews/2')
                 .expect(200)
                 .send(voteChange)
                 .then(({ body }) => {
-                    const review = body
-                    expect(review).toEqual({
+                    expect(body.review).toEqual({
                         review_id: 2,
                         title: 'Jenga',
                         category: 'dexterity',
@@ -126,15 +125,14 @@ describe('PATCH', () => {
         });
         test('200: should decrement the votes by the by the amount requested', () => {
             const voteChange = {
-                vote: -4
+                inc_vote: -4
             }
             return request(app)
                 .patch('/api/reviews/2')
                 .expect(200)
                 .send(voteChange)
                 .then(({ body }) => {
-                    const review = body
-                    expect(review).toEqual({
+                    expect(body.review).toEqual({
                         review_id: 2,
                         title: 'Jenga',
                         category: 'dexterity',
@@ -147,5 +145,45 @@ describe('PATCH', () => {
                     })
                 })
         });
+        test('404: should return a error when given a review_id that is invalid', () => {
+            const voteChange = {
+                inc_vote: 1
+            }
+
+            return request(app)
+                .patch('/api/reviews/banana')
+                .send(voteChange)
+                .expect(404)
+                .then(({ body }) => {
+                    expect(body.msg).toBe('ID does not exist');
+
+                });
+        });
+        test('404: should return a error when given a review_id that does not exist', () => {
+            const voteChange = {
+                inc_vote: 1
+            }
+            return request(app)
+                .patch('/api/reviews/7000')
+                .send(voteChange)
+                .expect(400)
+                .then(({ body }) => {
+                    expect(body.msg).toBe('ID does not exist');
+
+                });
+        });
+        test('404: should return an error when given an invalid value for the votes', () => {
+            const voteChange = {
+                inc_vote: 'banana'
+            }
+            return request(app)
+                .patch('/api/reviews/2')
+                .send(voteChange)
+                .expect(400)
+                .then(({ body }) => {
+                    expect(body.msg).toBe('Bad request');
+
+                });
+        });
     });
-});
+})

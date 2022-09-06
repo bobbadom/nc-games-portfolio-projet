@@ -77,7 +77,7 @@ describe('GET', () => {
                 });
         });
     })
-    describe.only('GET users', () => {
+    describe('GET users', () => {
         test('200: should return an array of the users', () => {
             return request(app)
                 .get('/api/users')

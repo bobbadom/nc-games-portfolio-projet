@@ -6,7 +6,6 @@ exports.patchReviews = ((req, res, next) => {
     const voteChange = req.body.vote
 
     patchReviewsModel(reviewID, voteChange).then((review) => {
-        console.log(review.rows[0])
         res.status(200).send(review.rows[0])
     })
         .catch((err) => {

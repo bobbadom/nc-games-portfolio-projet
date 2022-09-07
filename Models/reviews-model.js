@@ -4,8 +4,8 @@ exports.selectReviewByID = (reviewID) => {
     reviewID = parseInt(reviewID)
     if (Number.isNaN(reviewID) === true) { return Promise.reject({ status: 404, msg: 'Path not found' }) }
 
-    return db.query(`SELECT * FROM comments WHERE review_id=$1`, [reviewID]).then((result) => {
-        const commentCounter = result.rows.length
+    return db.query(`SELECT COUNT(*) FROM comments WHERE review_id=$1`, [reviewID]).then((result) => {
+        const commentCounter = result.rows[0].count
         return db.query(`ALTER TABLE reviews 
         ADD comment_count INT;
         UPDATE reviews
@@ -35,4 +35,14 @@ exports.updateReviewsVotes = (reviewID, voteChange) => {
         return results.rows[0]
     })
 
+}
+
+exports.selectReviews = () => {
+    return db.query(
+        `SELECT * FROM reviews
+        LEFT JOIN comments ON reviews.review_id = comments.review_id;`).then((results) => {
+            console.log(results.rows)
+            return results.rows
+
+        })
 }

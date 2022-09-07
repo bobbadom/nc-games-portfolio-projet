@@ -1,6 +1,6 @@
 const db = require('../db/connection')
 
-exports.getCategoriesModel = () => {
+exports.selectCategories = () => {
     return db.query('SELECT * FROM categories').then((result) => {
         return result.rows
     })

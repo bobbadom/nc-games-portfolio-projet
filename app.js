@@ -1,9 +1,9 @@
 const express = require('express')
 
-const { getCategories } = require('./Controllers/get-categories');
-const { getReviews } = require('./Controllers/get-reviews');
-const { getUsers } = require('./Controllers/get-users');
-const { patchReviews } = require('./Controllers/patch-reviews');
+const { getCategories } = require('./Controllers/categories-controller');
+const { getReviewsByID, patchReviewsByID } = require('./Controllers/reviews-controller');
+const { getUsers } = require('./Controllers/users-controllers');
+
 
 
 const app = express();
@@ -12,12 +12,11 @@ app.use(express.json());
 
 app.get('/api/categories', getCategories);
 
-app.get('/api/reviews/:review_id', getReviews)
+app.get('/api/reviews/:review_id', getReviewsByID)
 
 app.get('/api/users', getUsers)
 
-
-app.patch('/api/reviews/:review_id', patchReviews)
+app.patch('/api/reviews/:review_id', patchReviewsByID)
 
 app.all('*', (req, res, next) => {
     res.status(404).send({ msg: 'Path not found' })

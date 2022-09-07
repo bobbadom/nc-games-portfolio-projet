@@ -39,7 +39,7 @@ describe('GET', () => {
         });
     });
     describe('GET reviews', () => {
-        test('200: should return an array of the reviews with the added comment count', () => {
+        test('200: should return an array of the catagories', () => {
             return request(app)
                 .get('/api/reviews/2')
                 .expect(200)

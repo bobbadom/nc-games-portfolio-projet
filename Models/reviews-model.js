@@ -75,10 +75,27 @@ exports.selectReviews = (category) => {
         return db.query(queryStr, categoryArr).then((results) => {
 
             if (results.rows.length === 0 && categoryCheckerValidator === false) {
-                return Promise.reject({ status: 404, msg: 'ID does not exist' });
+                return Promise.reject({ status: 400, msg: 'ID is invalid' });
             }
             return results.rows
 
         })
     })
 }
+exports.selectCommentsByReviewID = ((reviewID) => {
+    reviewID = parseInt(reviewID)
+    if (Number.isNaN(reviewID) === true) { return Promise.reject({ status: 400, msg: 'ID is invalid' }) }
+
+    return db.query(`SELECT * FROM reviews`).then((result) => {
+        const idCount = result.rows.length
+        return db.query('SELECT * FROM comments WHERE review_id=$1', [reviewID]).then((results) => {
+
+            if (results.rows.length === 0 && reviewID > idCount) {
+                return Promise.reject({ status: 404, msg: 'path not found' });
+            }
+            return results.rows
+        })
+    })
+
+
+})

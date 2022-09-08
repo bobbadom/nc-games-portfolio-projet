@@ -29,76 +29,164 @@ describe('GET', () => {
                     expect(categories).toBeInstanceOf(Array)
                     expect(categories).toHaveLength(4)
                     categories.forEach((category) => {
-                        expect.objectContaining({
-                            slug: expect.any(String),
-                            description: expect.any(String),
+                        expect(category).toEqual(
+                            expect.objectContaining({
+                                slug: expect.any(String),
+                                description: expect.any(String),
 
-                        })
-                    })
-                })
-        });
-    });
-    describe('GET reviews', () => {
-        test('200: should return an array of the catagories', () => {
-            return request(app)
-                .get('/api/reviews/2')
-                .expect(200)
-                .then(({ body }) => {
-                    const review = body
-                    expect(review).toEqual({
-                        review_id: 2,
-                        title: 'Jenga',
-                        category: 'dexterity',
-                        designer: 'Leslie Scott',
-                        owner: 'philippaclaire9',
-                        review_body: 'Fiddly fun for all the family',
-                        review_img_url: 'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
-                        created_at: '2021-01-18T10:01:41.251Z',
-                        votes: 5,
-                        comment_count: 3
-                    })
+                            })
+                        );
+                    });
                 })
         })
-        test('404: should return a error when given a review_id that does not exist', () => {
-            return request(app)
-                .get('/api/reviews/100')
-                .expect(400)
-                .then(({ body }) => {
-                    expect(body.msg).toBe('ID does not exist');
-
-                });
-        });
-        test('404: should return a error when given a review_id that does not exist', () => {
-            return request(app)
-                .get('/api/reviews/banana')
-                .expect(404)
-                .then(({ body }) => {
-                    expect(body.msg).toBe('Path not found');
-
-                });
-        });
-    })
-    describe('GET users', () => {
-        test('200: should return an array of the users', () => {
-            return request(app)
-                .get('/api/users')
-                .expect(200)
-                .then(({ body }) => {
-                    const { users } = body
-                    expect(users).toBeInstanceOf(Array)
-                    expect(users).toHaveLength(4)
-                    users.forEach((user) => {
+    });
+});
+describe('GET reviews', () => {
+    test('200: should return an array of all the reviews', () => {
+        return request(app)
+            .get('/api/reviews')
+            .expect(200)
+            .then(({ body }) => {
+                const { reviews } = body
+                expect(reviews).toBeInstanceOf(Array)
+                expect(reviews).toHaveLength(13)
+                reviews.forEach((review) => {
+                    expect(review).toEqual(
                         expect.objectContaining({
-                            username: expect.any(String),
-                            name: expect.any(String),
-                            avatar_url: expect.any(String)
-
+                            category: expect.any(String),
+                            comment_count: expect.any(Number),
+                            designer: expect.any(String),
+                            owner: expect.any(String),
+                            created_at: expect.any(String),
+                            review_img_url: expect.any(String),
+                            review_id: expect.any(Number),
+                            title: expect.any(String),
+                            votes: expect.any(Number)
                         })
-                    })
+                    )
                 })
-        });
+            })
+    });
+    test('200: should return a sorted array of all the reviews sorted by date DESC', () => {
+        return request(app)
+            .get('/api/reviews')
+            .expect(200)
+            .then(({ body }) => {
+                const { reviews } = body
+                expect(reviews).toBeInstanceOf(Array)
+                expect(reviews).toHaveLength(13)
+                expect(reviews).toBeSortedBy('created_at', { descending: true })
+                reviews.forEach((review) => {
+                    expect(review).toEqual(
+                        expect.objectContaining({
+                            category: expect.any(String),
+                            comment_count: expect.any(Number),
+                            designer: expect.any(String),
+                            owner: expect.any(String),
+                            created_at: expect.any(String),
+                            review_img_url: expect.any(String),
+                            review_id: expect.any(Number),
+                            title: expect.any(String),
+                            votes: expect.any(Number)
+                        })
+                    )
+                })
+            })
+    });
+    test('200: should filter the reviews when given a category', () => {
+        return request(app)
+            .get('/api/reviews?category=dexterity')
+            .expect(200)
+            .then(({ body }) => {
+                const { reviews } = body
+                expect(reviews).toBeInstanceOf(Array)
+                expect(reviews).toHaveLength(1)
+                expect(reviews).toEqual([{ "category": "dexterity", "comment_count": 3, "created_at": "2021-01-18T10:01:41.251Z", "designer": "Leslie Scott", "owner": "philippaclaire9", "review_id": 2, "review_img_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png", "title": "Jenga", "votes": 5 }])
+            })
+    });
+    test('400: should return an error when given a category that does not exist', () => {
+        return request(app)
+            .get('/api/reviews?category=banana')
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe('ID does not exist');
+
+            });
+
+    })
+    test('200: should return an empty array when given a category that does exist but has no reviews', () => {
+        return request(app)
+            .get('/api/reviews?category=children\'s+games')
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.reviews).toEqual([]);
+
+            });
+
+    })
+
+})
+describe('GET review by id', () => {
+    test('200: should return an array of the catagories', () => {
+        return request(app)
+            .get('/api/reviews/2')
+            .expect(200)
+            .then(({ body }) => {
+                const review = body
+                expect(review).toEqual({
+                    review_id: 2,
+                    title: 'Jenga',
+                    category: 'dexterity',
+                    designer: 'Leslie Scott',
+                    owner: 'philippaclaire9',
+                    review_body: 'Fiddly fun for all the family',
+                    review_img_url: 'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
+                    created_at: '2021-01-18T10:01:41.251Z',
+                    votes: 5,
+                    comment_count: 3
+                })
+            })
+    })
+    test('404: should return a error when given a review_id that does not exist', () => {
+        return request(app)
+            .get('/api/reviews/100')
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe('ID does not exist');
+
+            });
+    });
+    test('404: should return a error when given a review_id that does not exist', () => {
+        return request(app)
+            .get('/api/reviews/banana')
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe('Path not found');
+
+            });
     });
 })
+describe('GET users', () => {
+    test('200: should return an array of the users', () => {
+        return request(app)
+            .get('/api/users')
+            .expect(200)
+            .then(({ body }) => {
+                const { users } = body
+                expect(users).toBeInstanceOf(Array)
+                expect(users).toHaveLength(4)
+                users.forEach((user) => {
+                    expect.objectContaining({
+                        username: expect.any(String),
+                        name: expect.any(String),
+                        avatar_url: expect.any(String)
+
+                    })
+                })
+            })
+    });
+});
+
 
 describe('PATCH', () => {
     describe('PATCH reviews', () => {
@@ -167,7 +255,7 @@ describe('PATCH', () => {
             return request(app)
                 .patch('/api/reviews/7000')
                 .send(voteChange)
-                .expect(400)
+                .expect(404)
                 .then(({ body }) => {
                     expect(body.msg).toBe('ID does not exist');
 

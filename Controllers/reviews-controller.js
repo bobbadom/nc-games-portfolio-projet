@@ -24,7 +24,11 @@ exports.patchReviewsByID = ((req, res, next) => {
 })
 
 exports.getReviews = ((req, res, next) => {
-    selectReviews().then((reviews) => {
+    const category = req.query.category
+    selectReviews(category).then((reviews) => {
         res.status(200).send({ reviews })
     })
+        .catch((err) => {
+            next(err);
+        });
 })

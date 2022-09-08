@@ -42,19 +42,19 @@ describe('GET', () => {
     });
 });
 describe('GET reviews', () => {
-    test.only('200: should return an array of all the reviews', () => {
+    test('200: should return an array of all the reviews', () => {
         return request(app)
             .get('/api/reviews')
             .expect(200)
             .then(({ body }) => {
                 const { reviews } = body
                 expect(reviews).toBeInstanceOf(Array)
-                expect(reviews).toHaveLength(17)
+                expect(reviews).toHaveLength(13)
                 reviews.forEach((review) => {
                     expect(review).toEqual(
                         expect.objectContaining({
                             category: expect.any(String),
-                            // comment_count: expect.any(Number),
+                            comment_count: expect.any(Number),
                             designer: expect.any(String),
                             owner: expect.any(String),
                             created_at: expect.any(String),
@@ -67,37 +67,64 @@ describe('GET reviews', () => {
                 })
             })
     });
-    test('200: should return correct counts for reviews with comments', () => {
+    test('200: should return a sorted array of all the reviews sorted by date DESC', () => {
         return request(app)
             .get('/api/reviews')
             .expect(200)
             .then(({ body }) => {
                 const { reviews } = body
-                // expect(reviews[1]).toEqual({
-                //     comment_count: 3,
-                //     review_id: 2,
-                //     title: 'Jenga',
-                //     category: 'dexterity',
-                //     designer: 'Leslie Scott',
-                //     owner: 'philippaclaire9',
-                //     review_img_url: 'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
-                //     created_at: '2021-01-18T10:01:41.251Z',
-                //     votes: 5,
-                // })
-                expect(reviews[12]).toEqual({
-                    review_id: 3,
-                    title: 'Ultimate Werewolf',
-                    category: 'social deduction',
-                    designer: 'Akihisa Okui',
-                    owner: 'bainesface',
-                    review_img_url: 'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
-                    created_at: '2021-01-18T10:01:41.251Z',
-                    votes: 5,
-                    comment_count: 3
+                expect(reviews).toBeInstanceOf(Array)
+                expect(reviews).toHaveLength(13)
+                expect(reviews).toBeSortedBy('created_at', { descending: true })
+                reviews.forEach((review) => {
+                    expect(review).toEqual(
+                        expect.objectContaining({
+                            category: expect.any(String),
+                            comment_count: expect.any(Number),
+                            designer: expect.any(String),
+                            owner: expect.any(String),
+                            created_at: expect.any(String),
+                            review_img_url: expect.any(String),
+                            review_id: expect.any(Number),
+                            title: expect.any(String),
+                            votes: expect.any(Number)
+                        })
+                    )
                 })
-
             })
     });
+    test('200: should filter the reviews when given a category', () => {
+        return request(app)
+            .get('/api/reviews?category=dexterity')
+            .expect(200)
+            .then(({ body }) => {
+                const { reviews } = body
+                expect(reviews).toBeInstanceOf(Array)
+                expect(reviews).toHaveLength(1)
+                expect(reviews).toEqual([{ "category": "dexterity", "comment_count": 3, "created_at": "2021-01-18T10:01:41.251Z", "designer": "Leslie Scott", "owner": "philippaclaire9", "review_id": 2, "review_img_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png", "title": "Jenga", "votes": 5 }])
+            })
+    });
+    test('400: should return an error when given a category that does not exist', () => {
+        return request(app)
+            .get('/api/reviews?category=banana')
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe('ID does not exist');
+
+            });
+
+    })
+    test('200: should return an empty array when given a category that does exist but has no reviews', () => {
+        return request(app)
+            .get('/api/reviews?category=children\'s+games')
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.reviews).toEqual([]);
+
+            });
+
+    })
+
 })
 describe('GET review by id', () => {
     test('200: should return an array of the catagories', () => {

@@ -14,7 +14,7 @@ exports.selectReviewByID = (reviewID) => {
         `)
             .then((results) => {
                 if (results[1].rows.length === 0) {
-                    return Promise.reject({ status: 400, msg: 'ID does not exist' });
+                    return Promise.reject({ status: 404, msg: 'ID does not exist' });
                 }
                 return results[1].rows[0]
             })
@@ -30,7 +30,7 @@ exports.updateReviewsVotes = (reviewID, voteChange) => {
     if (Number.isNaN(voteChange) === true) { return Promise.reject({ status: 400, msg: 'Bad request' }) }
     return db.query(`UPDATE reviews SET votes = votes + $1 WHERE review_id=$2 RETURNING *;`, [voteChange, reviewID]).then((results) => {
         if (results.rows.length === 0) {
-            return Promise.reject({ status: 400, msg: 'ID does not exist' });
+            return Promise.reject({ status: 404, msg: 'ID does not exist' });
         }
         return results.rows[0]
     })
@@ -75,7 +75,7 @@ exports.selectReviews = (category) => {
         return db.query(queryStr, categoryArr).then((results) => {
 
             if (results.rows.length === 0 && categoryCheckerValidator === false) {
-                return Promise.reject({ status: 400, msg: 'ID does not exist' });
+                return Promise.reject({ status: 404, msg: 'ID does not exist' });
             }
             return results.rows
 

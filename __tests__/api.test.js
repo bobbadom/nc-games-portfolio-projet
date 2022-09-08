@@ -107,7 +107,7 @@ describe('GET reviews', () => {
     test('400: should return an error when given a category that does not exist', () => {
         return request(app)
             .get('/api/reviews?category=banana')
-            .expect(400)
+            .expect(404)
             .then(({ body }) => {
                 expect(body.msg).toBe('ID does not exist');
 
@@ -150,7 +150,7 @@ describe('GET review by id', () => {
     test('404: should return a error when given a review_id that does not exist', () => {
         return request(app)
             .get('/api/reviews/100')
-            .expect(400)
+            .expect(404)
             .then(({ body }) => {
                 expect(body.msg).toBe('ID does not exist');
 
@@ -255,7 +255,7 @@ describe('PATCH', () => {
             return request(app)
                 .patch('/api/reviews/7000')
                 .send(voteChange)
-                .expect(400)
+                .expect(404)
                 .then(({ body }) => {
                     expect(body.msg).toBe('ID does not exist');
 

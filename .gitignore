@@ -1,2 +1,4 @@
 node_modules
 .env.*
+view-test-dbs.txt
+view-test-dbs.sql

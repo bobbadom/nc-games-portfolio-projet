@@ -327,3 +327,98 @@ describe('PATCH', () => {
         });
     });
 })
+describe('POST', () => {
+    describe('POST comment by review ID', () => {
+        test('201: should post a comment and return the posted comment', () => {
+            const newComment = {
+                username: 'bainesface',
+                body: 'What and amazing game'
+            }
+            return request(app)
+                .post('/api/reviews/1/comments')
+                .send(newComment)
+                .expect(201)
+                .then(({ body }) => {
+                    expect(body.comment).toEqual({
+                        votes: 0,
+                        review_id: 1,
+                        created_at: expect.any(String),
+                        author: 'bainesface',
+                        body: 'What and amazing game',
+                        comment_id: 7
+                    })
+                })
+        });
+        test('404: should return a error when given a review_id that does not exist', () => {
+            const newComment = {
+                username: 'bainesface',
+                body: 'What and amazing game'
+            }
+            return request(app)
+                .post('/api/reviews/100/comments')
+                .send(newComment)
+                .expect(404)
+                .then(({ body }) => {
+                    expect(body.msg).toBe('ID does not exist');
+
+                });
+        });
+        test('400: should return a error when given a review_id that is not a valid data type', () => {
+            const newComment = {
+                username: 'bainesface',
+                body: 'What and amazing game'
+            }
+            return request(app)
+                .post('/api/reviews/banana/comments')
+                .send(newComment)
+                .expect(400)
+                .then(({ body }) => {
+                    expect(body.msg).toBe("ID is invalid");
+
+                });
+        });
+        test('400: should return a error when given a body that is an invalid type', () => {
+            const newComment = {
+                username: 'bainesface',
+                body: 400
+            }
+            return request(app)
+                .post('/api/reviews/1/comments')
+                .send(newComment)
+                .expect(400)
+                .then(({ body }) => {
+                    expect(body.msg).toBe("Your comment is invalid");
+
+                });
+        });
+        test('400: should return a error when given a review_id that is not a valid data type', () => {
+            const newComment = {
+                username: 'bainesface',
+                body: ''
+            }
+            return request(app)
+                .post('/api/reviews/1/comments')
+                .send(newComment)
+                .expect(400)
+                .then(({ body }) => {
+                    expect(body.msg).toBe("Your comment is invalid");
+
+                });
+        });
+        test('400: should return a error when given a review_id that is not a valid data type', () => {
+            const newComment = {
+                username: 'bob',
+                body: 'What an amazing game'
+            }
+            return request(app)
+                .post('/api/reviews/1/comments')
+                .send(newComment)
+                .expect(404)
+                .then(({ body }) => {
+                    expect(body.msg).toBe('user does not exist');
+
+                });
+        });
+        //user doesnt exist
+    });
+})

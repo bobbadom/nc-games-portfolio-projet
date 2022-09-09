@@ -187,7 +187,7 @@ describe('GET users', () => {
             })
     });
 });
-describe.only('GET comment by review Id', () => {
+describe('GET comment by review Id', () => {
     test('200 :should return an array of comments when given a review ID', () => {
         return request(app)
             .get('/api/reviews/2/comments')

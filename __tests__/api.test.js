@@ -104,12 +104,12 @@ describe('GET reviews', () => {
                 expect(reviews).toEqual([{ "category": "dexterity", "comment_count": 3, "created_at": "2021-01-18T10:01:41.251Z", "designer": "Leslie Scott", "owner": "philippaclaire9", "review_id": 2, "review_img_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png", "title": "Jenga", "votes": 5 }])
             })
     });
-    test('400: should return an error when given a category that does not exist', () => {
+    test('404: should return an error when given a category that does not exist', () => {
         return request(app)
             .get('/api/reviews?category=banana')
             .expect(404)
             .then(({ body }) => {
-                expect(body.msg).toBe('ID does not exist');
+                expect(body.msg).toBe('Category doesn\'t exist');
 
             });
 
@@ -156,12 +156,12 @@ describe('GET review by id', () => {
 
             });
     });
-    test('404: should return a error when given a review_id that does not exist', () => {
+    test('400: should return a error when given a review_id that does not exist', () => {
         return request(app)
             .get('/api/reviews/banana')
-            .expect(404)
+            .expect(400)
             .then(({ body }) => {
-                expect(body.msg).toBe('Path not found');
+                expect(body.msg).toBe('Invalid review ID');
 
             });
     });
@@ -176,17 +176,68 @@ describe('GET users', () => {
                 expect(users).toBeInstanceOf(Array)
                 expect(users).toHaveLength(4)
                 users.forEach((user) => {
-                    expect.objectContaining({
-                        username: expect.any(String),
-                        name: expect.any(String),
-                        avatar_url: expect.any(String)
+                    expect(user).toEqual(
+                        expect.objectContaining({
+                            username: expect.any(String),
+                            name: expect.any(String),
+                            avatar_url: expect.any(String)
 
-                    })
+                        }))
                 })
             })
     });
 });
+describe('GET comment by review Id', () => {
+    test('200 :should return an array of comments when given a review ID', () => {
+        return request(app)
+            .get('/api/reviews/2/comments')
+            .expect(200)
+            .then(({ body }) => {
+                const { comments } = body
+                expect(comments).toBeInstanceOf(Array)
+                expect(comments).toHaveLength(3)
+                comments.forEach((comment) => {
+                    expect(comment).toEqual(
+                        expect.objectContaining({
+                            comment_id: expect.any(Number),
+                            votes: expect.any(Number),
+                            created_at: expect.any(String),
+                            author: expect.any(String),
+                            body: expect.any(String),
+                            review_id: expect.any(Number)
 
+                        }))
+                })
+            })
+    });
+    test('400 :should return an error when given a invalid review ID', () => {
+        return request(app)
+            .get('/api/reviews/banana/comments')
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe('ID is invalid');
+
+            });
+    });
+    test('404 :should return an error when given a review id that does not exist', () => {
+        return request(app)
+            .get('/api/reviews/600000/comments')
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe('path not found');
+
+            });
+    });
+    test('200: should return an empty array when given a valid review ID but has no comments', () => {
+        return request(app)
+            .get('/api/reviews/1/comments')
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.comments).toEqual([]);
+
+            });
+    });
+})
 
 describe('PATCH', () => {
     describe('PATCH reviews', () => {
@@ -234,7 +285,7 @@ describe('PATCH', () => {
                     })
                 })
         });
-        test('404: should return a error when given a review_id that is invalid', () => {
+        test('400: should return a error when given a review_id that is invalid', () => {
             const voteChange = {
                 inc_vote: 1
             }
@@ -242,9 +293,9 @@ describe('PATCH', () => {
             return request(app)
                 .patch('/api/reviews/banana')
                 .send(voteChange)
-                .expect(404)
+                .expect(400)
                 .then(({ body }) => {
-                    expect(body.msg).toBe('ID does not exist');
+                    expect(body.msg).toBe('ID is not valid');
 
                 });
         });
@@ -261,7 +312,7 @@ describe('PATCH', () => {
 
                 });
         });
-        test('404: should return an error when given an invalid value for the votes', () => {
+        test('400: should return an error when given an invalid value for the votes', () => {
             const voteChange = {
                 inc_vote: 'banana'
             }
@@ -270,7 +321,7 @@ describe('PATCH', () => {
                 .send(voteChange)
                 .expect(400)
                 .then(({ body }) => {
-                    expect(body.msg).toBe('Bad request');
+                    expect(body.msg).toBe('Invalid value for votes');
 
                 });
         });

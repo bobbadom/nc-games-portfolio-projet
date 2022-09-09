@@ -2,7 +2,7 @@ const db = require('../db/connection')
 
 exports.selectReviewByID = (reviewID) => {
     reviewID = parseInt(reviewID)
-    if (Number.isNaN(reviewID) === true) { return Promise.reject({ status: 404, msg: 'Path not found' }) }
+    if (Number.isNaN(reviewID) === true) { return Promise.reject({ status: 400, msg: 'Invalid review ID' }) }
 
     return db.query(`SELECT COUNT(*) FROM comments WHERE review_id=$1`, [reviewID]).then((result) => {
         const commentCounter = result.rows[0].count
@@ -25,9 +25,9 @@ exports.updateReviewsVotes = (reviewID, voteChange) => {
     reviewID = parseInt(reviewID)
     voteChange = parseInt(voteChange)
 
-    if (Number.isNaN(reviewID) === true) { return Promise.reject({ status: 404, msg: 'ID does not exist' }) }
+    if (Number.isNaN(reviewID) === true) { return Promise.reject({ status: 400, msg: 'ID is not valid' }) }
 
-    if (Number.isNaN(voteChange) === true) { return Promise.reject({ status: 400, msg: 'Bad request' }) }
+    if (Number.isNaN(voteChange) === true) { return Promise.reject({ status: 400, msg: 'Invalid value for votes' }) }
     return db.query(`UPDATE reviews SET votes = votes + $1 WHERE review_id=$2 RETURNING *;`, [voteChange, reviewID]).then((results) => {
         if (results.rows.length === 0) {
             return Promise.reject({ status: 404, msg: 'ID does not exist' });
@@ -75,13 +75,42 @@ exports.selectReviews = (category) => {
         return db.query(queryStr, categoryArr).then((results) => {
 
             if (results.rows.length === 0 && categoryCheckerValidator === false) {
-                return Promise.reject({ status: 404, msg: 'ID does not exist' });
+                return Promise.reject({ status: 404, msg: 'Category doesn\'t exist' });
             }
             return results.rows
 
         })
     })
 }
+
+exports.selectCommentsByReviewID = ((reviewID) => {
+    reviewID = parseInt(reviewID)
+    if (Number.isNaN(reviewID) === true) { return Promise.reject({ status: 400, msg: 'ID is invalid' }) }
+
+    return db.query(`SELECT review_id FROM reviews`).then((result) => {
+        let reviewIDArr = result.rows
+        const reviewIDCheckerArr = reviewIDArr.map((item) => {
+            return item.review_id
+        })
+        let reviewIDValidator = false
+
+        reviewIDCheckerArr.forEach((checkedID) => {
+            if (reviewID === checkedID) {
+                reviewIDValidator = true
+            }
+        })
+
+        return db.query('SELECT * FROM comments WHERE review_id=$1', [reviewID]).then((results) => {
+
+            if (results.rows.length === 0 && reviewIDValidator === false) {
+                return Promise.reject({ status: 404, msg: 'path not found' });
+            }
+            return results.rows
+        })
+    })
+
+
+})
 
 exports.insertReviewByID = ((newComment, reviewID) => {
     const { body, username } = newComment

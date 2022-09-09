@@ -104,12 +104,12 @@ describe('GET reviews', () => {
                 expect(reviews).toEqual([{ "category": "dexterity", "comment_count": 3, "created_at": "2021-01-18T10:01:41.251Z", "designer": "Leslie Scott", "owner": "philippaclaire9", "review_id": 2, "review_img_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png", "title": "Jenga", "votes": 5 }])
             })
     });
-    test('400: should return an error when given a category that does not exist', () => {
+    test('404: should return an error when given a category that does not exist', () => {
         return request(app)
             .get('/api/reviews?category=banana')
-            .expect(400)
+            .expect(404)
             .then(({ body }) => {
-                expect(body.msg).toBe('ID is invalid');
+                expect(body.msg).toBe('Category doesn\'t exist');
 
             });
 
@@ -156,12 +156,12 @@ describe('GET review by id', () => {
 
             });
     });
-    test('404: should return a error when given a review_id that does not exist', () => {
+    test('400: should return a error when given a review_id that does not exist', () => {
         return request(app)
             .get('/api/reviews/banana')
-            .expect(404)
+            .expect(400)
             .then(({ body }) => {
-                expect(body.msg).toBe('Path not found');
+                expect(body.msg).toBe('Invalid review ID');
 
             });
     });
@@ -285,7 +285,7 @@ describe('PATCH', () => {
                     })
                 })
         });
-        test('404: should return a error when given a review_id that is invalid', () => {
+        test('400: should return a error when given a review_id that is invalid', () => {
             const voteChange = {
                 inc_vote: 1
             }
@@ -293,9 +293,9 @@ describe('PATCH', () => {
             return request(app)
                 .patch('/api/reviews/banana')
                 .send(voteChange)
-                .expect(404)
+                .expect(400)
                 .then(({ body }) => {
-                    expect(body.msg).toBe('ID does not exist');
+                    expect(body.msg).toBe('ID is not valid');
 
                 });
         });
@@ -312,7 +312,7 @@ describe('PATCH', () => {
 
                 });
         });
-        test('404: should return an error when given an invalid value for the votes', () => {
+        test('400: should return an error when given an invalid value for the votes', () => {
             const voteChange = {
                 inc_vote: 'banana'
             }
@@ -321,7 +321,7 @@ describe('PATCH', () => {
                 .send(voteChange)
                 .expect(400)
                 .then(({ body }) => {
-                    expect(body.msg).toBe('Bad request');
+                    expect(body.msg).toBe('Invalid value for votes');
 
                 });
         });

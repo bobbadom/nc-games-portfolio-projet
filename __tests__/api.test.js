@@ -187,7 +187,7 @@ describe('GET users', () => {
             })
     });
 });
-describe('GET comment by review Id', () => {
+describe.only('GET comment by review Id', () => {
     test('200 :should return an array of comments when given a review ID', () => {
         return request(app)
             .get('/api/reviews/2/comments')
@@ -210,7 +210,7 @@ describe('GET comment by review Id', () => {
                 })
             })
     });
-    test('400 :should return an error when given ', () => {
+    test('400 :should return an error when given a invalid review ID', () => {
         return request(app)
             .get('/api/reviews/banana/comments')
             .expect(400)
@@ -219,7 +219,7 @@ describe('GET comment by review Id', () => {
 
             });
     });
-    test('404 :should return an error when given ', () => {
+    test('404 :should return an error when given a review id that does not exist', () => {
         return request(app)
             .get('/api/reviews/600000/comments')
             .expect(404)

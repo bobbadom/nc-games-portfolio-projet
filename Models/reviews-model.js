@@ -86,11 +86,22 @@ exports.selectCommentsByReviewID = ((reviewID) => {
     reviewID = parseInt(reviewID)
     if (Number.isNaN(reviewID) === true) { return Promise.reject({ status: 400, msg: 'ID is invalid' }) }
 
-    return db.query(`SELECT * FROM reviews`).then((result) => {
-        const idCount = result.rows.length
+    return db.query(`SELECT review_id FROM reviews`).then((result) => {
+        let reviewIDArr = result.rows
+        const reviewIDCheckerArr = reviewIDArr.map((item) => {
+            return item.review_id
+        })
+        let reviewIDValidator = false
+
+        reviewIDCheckerArr.forEach((checkedID) => {
+            if (reviewID === checkedID) {
+                reviewIDValidator = true
+            }
+        })
+
         return db.query('SELECT * FROM comments WHERE review_id=$1', [reviewID]).then((results) => {
 
-            if (results.rows.length === 0 && reviewID > idCount) {
+            if (results.rows.length === 0 && reviewIDValidator === false) {
                 return Promise.reject({ status: 404, msg: 'path not found' });
             }
             return results.rows

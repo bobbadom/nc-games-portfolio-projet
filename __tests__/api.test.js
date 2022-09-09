@@ -551,6 +551,7 @@ describe('DELETE', () => {
             return request(app)
                 .delete('/api/comments/1')
                 .expect(204)
+
         });
         test('400 : it should return an error when given an invalid comment ID', () => {
             return request(app)

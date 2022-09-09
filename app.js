@@ -1,7 +1,7 @@
 const express = require('express')
 
 const { getCategories } = require('./Controllers/categories-controller');
-const { getReviewsByID, patchReviewsByID, getReviews } = require('./Controllers/reviews-controller');
+const { getReviewsByID, patchReviewsByID, getReviews, postReviewsByID } = require('./Controllers/reviews-controller');
 const { getUsers } = require('./Controllers/users-controllers');
 
 
@@ -19,6 +19,8 @@ app.get('/api/users', getUsers)
 app.patch('/api/reviews/:review_id', patchReviewsByID)
 
 app.get('/api/reviews', getReviews)
+
+app.post('/api/reviews/:review_id/comments', postReviewsByID)
 
 app.all('*', (req, res, next) => {
     res.status(404).send({ msg: 'Path not found' })

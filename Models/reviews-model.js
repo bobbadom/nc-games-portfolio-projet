@@ -82,3 +82,17 @@ exports.selectReviews = (category) => {
         })
     })
 }
+
+exports.insertReviewByID = ((newComment, reviewID) => {
+    const { body, username } = newComment
+
+
+
+
+    return db.query(`INSERT INTO comments (body, review_id, author) 
+    VALUES ($1, $2, $3)
+    RETURNING * ;`, [body, reviewID, username]).then((result) => {
+        console.log(result.rows)
+        return result.rows[0]
+    })
+})

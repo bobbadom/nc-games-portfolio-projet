@@ -276,3 +276,27 @@ describe('PATCH', () => {
         });
     });
 })
+describe.only('POST', () => {
+    describe('POST comment by review ID', () => {
+        test('201: should post a comment and return the posted comment', () => {
+            const newComment = {
+                username: 'bainesface',
+                body: 'What and amazing game'
+            }
+            return request(app)
+                .post('/api/reviews/1/comments')
+                .send(newComment)
+                .expect(201)
+                .then(({ body }) => {
+                    expect(body.comment).toEqual({
+                        votes: 0,
+                        review_id: 1,
+                        created_at: expect.any(String),
+                        author: 'bainesface',
+                        body: 'What and amazing game',
+                        comment_id: 7
+                    })
+                })
+        });
+    });
+});

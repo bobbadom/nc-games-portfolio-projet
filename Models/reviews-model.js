@@ -44,6 +44,10 @@ exports.selectReviews = (category, order = 'DESC', sortBy = 'reviews.created_at'
         let columnValidator = false
         const columnArray = ['review_id', 'category', 'review_img_url', 'created_at', 'votes', 'title', 'owner', 'designer', 'comment_count']
 
+        if (order !== 'DESC' && order !== 'ASC') {
+            order = 'DESC'
+        }
+
         columnArray.forEach((column) => {
             if (column === sortBy) {
                 columnValidator = true

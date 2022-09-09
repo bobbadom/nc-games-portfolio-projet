@@ -245,7 +245,32 @@ describe('GET', () => {
                     })
                 })
         });
-
+        test('200: should still return an array of all the reviews when given a invalid order by value', () => {
+            return request(app)
+                .get('/api/reviews?order=banana')
+                .expect(200)
+                .then(({ body }) => {
+                    const { reviews } = body
+                    expect(reviews).toBeInstanceOf(Array)
+                    expect(reviews).toHaveLength(13)
+                    expect(reviews).toBeSortedBy('created_at', { descending: true })
+                    reviews.forEach((review) => {
+                        expect(review).toEqual(
+                            expect.objectContaining({
+                                category: expect.any(String),
+                                comment_count: expect.any(Number),
+                                designer: expect.any(String),
+                                owner: expect.any(String),
+                                created_at: expect.any(String),
+                                review_img_url: expect.any(String),
+                                review_id: expect.any(Number),
+                                title: expect.any(String),
+                                votes: expect.any(Number)
+                            })
+                        )
+                    })
+                })
+        });
 
 
     })

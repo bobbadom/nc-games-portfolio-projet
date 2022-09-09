@@ -85,14 +85,55 @@ exports.selectReviews = (category) => {
 
 exports.insertReviewByID = ((newComment, reviewID) => {
     const { body, username } = newComment
+    reviewID = parseInt(reviewID)
+    if (Number.isNaN(parseInt(body)) === false || body.length === 0) { return Promise.reject({ status: 400, msg: "Your comment is invalid" }) }
+    if (Number.isNaN(reviewID) === true) { return Promise.reject({ status: 400, msg: 'ID is invalid' }) }
+
+    return db.query('SELECT username FROM users').then((res) => {
+        let userArr = res.rows
+
+        const userCheckerArr = userArr.map((item) => {
+            return item.username
+        })
+
+        let reviewIDValidator = false
+
+        userCheckerArr.forEach((checkedUser) => {
+            if (username === checkedUser) {
+                reviewIDValidator = true
+            }
+        })
 
 
+        if (reviewIDValidator === false) {
+            return Promise.reject({ status: 404, msg: 'user does not exist' });
+        }
+
+        return db.query(`SELECT review_id FROM reviews`).then((result) => {
+            let reviewIDArr = result.rows
+
+            const reviewIDCheckerArr = reviewIDArr.map((item) => {
+                return item.review_id
+            })
+            let reviewIDValidator = false
+
+            reviewIDCheckerArr.forEach((checkedID) => {
+                if (reviewID === checkedID) {
+                    reviewIDValidator = true
+                }
+            })
 
 
-    return db.query(`INSERT INTO comments (body, review_id, author) 
-    VALUES ($1, $2, $3)
-    RETURNING * ;`, [body, reviewID, username]).then((result) => {
-        console.log(result.rows)
-        return result.rows[0]
+            if (reviewIDValidator === false) {
+                return Promise.reject({ status: 404, msg: 'ID does not exist' });
+            }
+            return db.query(`INSERT INTO comments (body, review_id, author) 
+        VALUES ($1, $2, $3)
+        RETURNING * ;`, [body, reviewID, username]).then((result) => {
+
+
+                return result.rows[0]
+            })
+        })
     })
 })

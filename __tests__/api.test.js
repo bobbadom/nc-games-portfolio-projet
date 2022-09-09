@@ -570,6 +570,33 @@ describe('POST', () => {
     });
 })
 
+describe('DELETE', () => {
+    describe('DELETE comment by comment ID', () => {
+        test('204: it should return only an error code when given a valid comment ID', () => {
+            return request(app)
+                .delete('/api/comments/1')
+                .expect(204)
+
+        });
+        test('400 : it should return an error when given an invalid comment ID', () => {
+            return request(app)
+                .delete('/api/comments/banana')
+                .expect(400)
+                .then(({ body }) => {
+                    expect(body.msg).toBe('Invalid comment ID')
+                })
+        });
+        test('404 : it should return an error when given a comment ID that does not exist', () => {
+            return request(app)
+                .delete('/api/comments/6000000')
+                .expect(404)
+                .then(({ body }) => {
+                    expect(body.msg).toBe('ID does not exist')
+                })
+        });
+    });
+});
+
 describe('Error handling', () => {
     describe('checking wrong paths', () => {
 

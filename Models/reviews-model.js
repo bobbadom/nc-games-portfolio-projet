@@ -37,9 +37,23 @@ exports.updateReviewsVotes = (reviewID, voteChange) => {
 
 }
 
-exports.selectReviews = (category) => {
+exports.selectReviews = (category, order = 'DESC', sortBy = 'reviews.created_at') => {
+    order = order.toUpperCase()
     return db.query(`SELECT slug FROM categories`).then((result) => {
         let slugArr = result.rows
+        let columnValidator = false
+        const columnArray = ['review_id', 'category', 'review_img_url', 'created_at', 'votes', 'title', 'owner', 'designer', 'comment_count']
+
+        columnArray.forEach((column) => {
+            if (column === sortBy) {
+                columnValidator = true
+            }
+        })
+        if (columnValidator === false) {
+            sortBy = 'created_at'
+        }
+
+
         const categoryCheckerArr = slugArr.map((item) => {
             return item.slug
         })
@@ -70,8 +84,10 @@ exports.selectReviews = (category) => {
             categoryArr.push(category)
             queryStr += ` WHERE reviews.category=$1 `
         }
+
         queryStr += ` GROUP BY reviews.review_id
-      ORDER BY reviews.created_at DESC;`
+          ORDER BY ${sortBy} ${order};`
+
         return db.query(queryStr, categoryArr).then((results) => {
 
             if (results.rows.length === 0 && categoryCheckerValidator === false) {

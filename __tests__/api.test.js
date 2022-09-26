@@ -539,7 +539,7 @@ describe('POST', () => {
 
                 });
         });
-        test('400: should return a error when given a review_id that is not a valid data type', () => {
+        test('400: should return a error when given a review_id there is no comment', () => {
             const newComment = {
                 username: 'bainesface',
                 body: ''

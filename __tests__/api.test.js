@@ -280,8 +280,7 @@ describe('GET', () => {
                 .get('/api/reviews/2')
                 .expect(200)
                 .then(({ body }) => {
-                    const review = body
-                    expect(review).toEqual({
+                    expect(body).toEqual({
                         review_id: 2,
                         title: 'Jenga',
                         category: 'dexterity',
